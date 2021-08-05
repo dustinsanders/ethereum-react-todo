@@ -1,4 +1,4 @@
-const { expect, util } = require('chai')
+const { expect } = require('chai')
 const { utils } = require('ethers')
 const { ethers } = require('hardhat')
 
@@ -123,4 +123,5 @@ describe.only('Todo Contract', () => {
   // it('should revert item confirmation if not complete yet', async () => {}
   // it('should revert item confirmation if exact amount is not sent', async () => {}
   // it('should revert item confirmation if already confirmed', async () => {}
+  // it('should be locked from changes if deleted)
 })

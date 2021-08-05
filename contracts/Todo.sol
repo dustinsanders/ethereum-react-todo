@@ -8,7 +8,7 @@ contract Todo is Ownable {
 
   struct Item {
     bytes32 title;
-    uint price;
+    uint256 price;
     address assignee;
     bool completed;
     bool deleted;
