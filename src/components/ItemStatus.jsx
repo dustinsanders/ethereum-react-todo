@@ -1,33 +1,28 @@
 import React from 'react';
-import {
-  Badge,
-  Button,
-} from 'evergreen-ui'
+import { Badge } from 'evergreen-ui'
+import statusEnum from '../enums/status'
 
-const ItemStatus = ({ completed, confirmed, deleted }) => {
-  if (deleted) {
-    return <Badge color="red">Deleted</Badge>
+const ItemStatus = ({
+  assignee,
+  status,
+}) => {
+  switch (status) {
+    case statusEnum.CREATED: {
+      return <Badge color="blue">In Progress</Badge>
+    }
+    case statusEnum.COMPLETED: {
+      return <Badge color="yellow">Completed</Badge>
+    }
+    case statusEnum.CONFIRMED: {
+      return <Badge color="green">Confirmed & Paid</Badge>
+    }
+    case statusEnum.DELETED: {
+      return <Badge color="red">Deleted</Badge>
+    }
+    default: {
+      return <></>
+    }
   }
-
-  if (confirmed) {
-    return <Badge color="green">Confirmed & Paid</Badge>
-  }
-
-  if (completed) {
-    return (
-      <>
-        <Badge color="yellow">Completed</Badge>
-        <Button>Confirm & Pay</Button>
-      </>
-    )
-  }
-
-  return (
-    <>
-      <Badge color="blue">In Progress</Badge>
-      <Button>Complete</Button>
-    </>
-  )
 }
 
 export default ItemStatus

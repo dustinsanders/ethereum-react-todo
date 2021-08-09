@@ -1,42 +1,74 @@
-import { useCallback, useEffect } from 'react'
-import { addItem, getItems} from './helper'
-import { createGlobalState } from 'react-use'
+import { useCallback } from 'react'
+import { createGlobalState, useEffectOnce } from 'react-use'
+import detectEthereumProvider from '@metamask/detect-provider'
+import contract from './contract'
 
 const initialState = {
   loading: true,
   items: null,
+  owner: null,
+  selectedAddress: null,
 }
 
 const useTodoState = createGlobalState(() => initialState)
 
 const useTodoContract =  () => {
   const [state, setState] = useTodoState()
-  const { items, loading } = state
 
   const updateState = useCallback(delta => setState({
     ...state,
     ...delta,
   }), [state, setState])
 
+  const initialize = useCallback(async () => {
+    updateState({ loading: true })
+    const provider = await detectEthereumProvider()
 
-  useEffect(() => {
-    if (items === null) {
-      updateState({ loading: true })
-      getItems(value => updateState({
-        items: value,
-        loading: false,
-      }))
+    window.ethereum.on('accountsChanged', (accounts) => {
+      window.location.reload()
+    })
+
+    const [owner, items] = await Promise.all([
+      contract.owner(),
+      contract.getItems(),
+    ])
+
+    const { selectedAddress } = provider
+
+    console.log('owner', owner)
+    console.log('selectedAddress', selectedAddress)
+
+    updateState({
+      items,
+      loading: false,
+      owner,
+      selectedAddress,
+      isOwner: owner.toLowerCase() === selectedAddress.toLowerCase(),
+    })
+  }, [updateState])
+
+  const makeRefetchItems = useCallback(
+    action =>
+      async (...args) => {
+        await action(...args)
+        const items = await contract.getItems()
+
+        updateState({ items})
+      },
+    [updateState],
+  )
+
+  useEffectOnce(() => {
+    if (state.items === null) {
+      initialize()
     }
-  }, [])
+  })
 
   return {
-    addItem: async ({ title, price, assignee }) =>
-      addItem(
-        { title, price, assignee },
-        value => updateState({ items: value }),
-      ),
-    items,
-    loading,
+    ...state,
+    addItem: makeRefetchItems(contract.addItem),
+    completeItem: makeRefetchItems(contract.completeItem),
+    confirmItem: makeRefetchItems(contract.confirmItem),
   }
 }
 

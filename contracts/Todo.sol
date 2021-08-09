@@ -5,15 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Todo is Ownable {
   Item[] public items;
+  enum Status{ CREATED, COMPLETED, CONFIRMED, DELETED }
 
   struct Item {
     bytes32 title;
     uint256 price;
     address assignee;
-    bool completed;
-    bool deleted;
-    bool confirmed;
+    Status status;
   }
+
+  // TODO
+  // mapping(address => Item[]) items;
 
   modifier onlyAssignee(uint _idx) {
     require(msg.sender == items[_idx].assignee, "Only the assignee can complete the task");
@@ -21,30 +23,36 @@ contract Todo is Ownable {
     _;
   }
 
+  modifier notDeleted(uint _idx) {
+    require(items[_idx].status != Status.DELETED, "Item has been deleted by owner");
+
+    _;
+  }
+
   function addItem(bytes32 _title, uint _itemPrice, address _assignee) public onlyOwner {
-    items.push(Item(_title, _itemPrice, _assignee, false, false, false));
+    items.push(Item(_title, _itemPrice, _assignee, Status.CREATED));
   }
 
   function getItems() public view returns(Item[] memory) {
     return items;
   }
 
-  function deleteItem(uint _idx) public onlyOwner {
-    items[_idx].deleted = true;
+  function deleteItem(uint _idx) public onlyOwner notDeleted(_idx) {
+    items[_idx].status = Status.DELETED;
   }
 
-  function completeItem(uint _idx) public onlyAssignee(_idx) {
-    items[_idx].completed = true;
+  function completeItem(uint _idx) public onlyAssignee(_idx) notDeleted(_idx) {
+    require(items[_idx].status == Status.CREATED, "Incorrect status to complete item");
+    items[_idx].status = Status.COMPLETED;
   }
 
-  function confirmItem(uint _idx) public payable onlyOwner {
-    require(items[_idx].completed == true, "Item has not been completed yet.");
-    require(items[_idx].confirmed == false, "Item has already been confirmed and paid for.");
+  function confirmItem(uint _idx) public payable onlyOwner notDeleted(_idx) {
+    require(items[_idx].status == Status.COMPLETED, "Incorrect status to confirm item");
     require(items[_idx].price == msg.value, "Only full payments accepted.");
 
     ( bool success, ) = address(items[_idx].assignee).call{value:msg.value}("");
     require(success, "Transfer failed.");
 
-    items[_idx].confirmed = true;
+    items[_idx].status = Status.CONFIRMED;
   }
 }

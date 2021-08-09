@@ -13,7 +13,7 @@ import toNumber from 'lodash/toNumber'
 const minimumPrice = .01
 
 const AddItem = () => {
-  const { addItem } = useTodoContract()
+  const { addItem, isOwner } = useTodoContract()
 
   const [assignee, setAssignee] = useState('')
   const [title, setTitle] = useState('')
@@ -50,6 +50,7 @@ const AddItem = () => {
         iconBefore={EditIcon}
         width="100%"
         onClick={() => setOpen(true)}
+        disabled={!isOwner}
       >
         Add New Item
       </Button>

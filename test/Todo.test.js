@@ -54,9 +54,6 @@ describe.only('Todo Contract', () => {
     expect(parseBytes32String(item.title)).to.equal(itemOptions.title)
     expect(item.price).to.equal(itemOptions.price)
     expect(item.assignee).to.equal(itemOptions.assignee)
-    expect(item.completed).to.be.false
-    expect(item.deleted).to.be.false
-    expect(item.confirmed).to.be.false
   })
 
   it('should allow owner to create items', async () => {
@@ -70,7 +67,7 @@ describe.only('Todo Contract', () => {
     await addItem(todo)
     await todo.deleteItem(0)
 
-    expect(await todo.items(0)).to.have.property('deleted', true)
+    expect(await todo.items(0)).to.have.property('status', 3)
   })
 
   it('should revert if non-owner tries to delete item', async () => {
@@ -90,7 +87,7 @@ describe.only('Todo Contract', () => {
       .connect(assignee)
       .completeItem(0)
 
-    expect(await todo.items(0)).to.have.property('completed', true)
+    expect(await todo.items(0)).to.have.property('status', 1)
   })
 
   it('should revert if non-assignee tries to complete item', async () => {
@@ -113,7 +110,7 @@ describe.only('Todo Contract', () => {
 
     await todo.confirmItem(0, { value: price })
 
-    expect(await todo.items(0)).to.have.property('confirmed', true)
+    expect(await todo.items(0)).to.have.property('status', 2)
     // console.log('after', BigNumber.from(await assignee.getBalance()))
     const balanceAfter = await assignee.getBalance()
     console.log(utils.formatEther(balanceAfter))

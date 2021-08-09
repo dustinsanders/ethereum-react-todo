@@ -5,30 +5,38 @@ import {
   Pane,
   Text,
 } from 'evergreen-ui'
+import ItemAction from './ItemAction'
 import ItemStatus from './ItemStatus'
 
 const Items = ({ items }) => {
-  return items.map(item => (
+  return items.map((item, idx) => (
     <Card
-      elevation={2}
+      elevation={1}
       key={item.title}
       width="100%"
       height={120}
       margin={8}
+      paddingX={24}
       display="flex"
-      justifyContent="space-around"
-      alignItems="center"
       flexDirection="column"
     >
         <Pane
           display="flex"
-          alignItems="center"
-          justifyContent="space-between"
           width="100%"
-          paddingX={24}
+          alignItems="center"
         >
-          <Heading marginRight={8}>{item.title}</Heading>
-          <ItemStatus {...item} />
+          <Pane
+            display="flex"
+            flexDirection="column"
+            width="100%"
+            marginY={8}
+          >
+            <Heading>{item.title}</Heading>
+            <div>
+              <ItemStatus {...item} />
+            </div>
+          </Pane>
+          <ItemAction {...item} idx={idx} />
         </Pane>
         <Text>Assignee: {item.assignee}</Text>
         <Text>Cost: {item.priceInEth}(ETH)</Text>
