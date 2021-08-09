@@ -23,12 +23,6 @@ contract Todo is Ownable {
     _;
   }
 
-  modifier notDeleted(uint _idx) {
-    require(items[_idx].status != Status.DELETED, "Item has been deleted by owner");
-
-    _;
-  }
-
   function addItem(bytes32 _title, uint _itemPrice, address _assignee) public onlyOwner {
     items.push(Item(_title, _itemPrice, _assignee, Status.CREATED));
   }
@@ -37,16 +31,17 @@ contract Todo is Ownable {
     return items;
   }
 
-  function deleteItem(uint _idx) public onlyOwner notDeleted(_idx) {
+  function deleteItem(uint _idx) public onlyOwner {
+    require(items[_idx].status == Status.CREATED, "Incorrect status to delete item");
     items[_idx].status = Status.DELETED;
   }
 
-  function completeItem(uint _idx) public onlyAssignee(_idx) notDeleted(_idx) {
+  function completeItem(uint _idx) public onlyAssignee(_idx) {
     require(items[_idx].status == Status.CREATED, "Incorrect status to complete item");
     items[_idx].status = Status.COMPLETED;
   }
 
-  function confirmItem(uint _idx) public payable onlyOwner notDeleted(_idx) {
+  function confirmItem(uint _idx) public payable onlyOwner {
     require(items[_idx].status == Status.COMPLETED, "Incorrect status to confirm item");
     require(items[_idx].price == msg.value, "Only full payments accepted.");
 

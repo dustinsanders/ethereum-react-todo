@@ -63,10 +63,14 @@ const completeItem = async idx =>
 const confirmItem = async (idx, price) =>
   performTransaction(async todo => todo.confirmItem(idx, { value: price }))
 
+const deleteItem = async (idx) =>
+  performTransaction(async todo => todo.deleteItem(idx))
+
 const contract = {
   addItem,
   completeItem,
   confirmItem,
+  deleteItem,
   getItems,
   owner,
 }

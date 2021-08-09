@@ -7,6 +7,7 @@ import {
 } from 'evergreen-ui'
 import ItemAction from './ItemAction'
 import ItemStatus from './ItemStatus'
+import statusEnum from '../enums/status'
 
 const Items = ({ items }) => {
   return items.map((item, idx) => (
@@ -31,7 +32,11 @@ const Items = ({ items }) => {
             width="100%"
             marginY={8}
           >
-            <Heading>{item.title}</Heading>
+            <Heading
+              textDecoration={item.status === statusEnum.DELETED ? 'line-through' : 'auto'}
+            >
+              {item.title}
+            </Heading>
             <div>
               <ItemStatus {...item} />
             </div>

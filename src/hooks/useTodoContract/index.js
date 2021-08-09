@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { createGlobalState, useEffectOnce } from 'react-use'
 import detectEthereumProvider from '@metamask/detect-provider'
 import contract from './contract'
+import get from 'lodash/get'
 
 const initialState = {
   loading: true,
@@ -33,10 +34,7 @@ const useTodoContract =  () => {
       contract.getItems(),
     ])
 
-    const { selectedAddress } = provider
-
-    console.log('owner', owner)
-    console.log('selectedAddress', selectedAddress)
+    const selectedAddress = get(provider, 'selectedAddress', '')
 
     updateState({
       items,
@@ -69,6 +67,7 @@ const useTodoContract =  () => {
     addItem: makeRefetchItems(contract.addItem),
     completeItem: makeRefetchItems(contract.completeItem),
     confirmItem: makeRefetchItems(contract.confirmItem),
+    deleteItem: makeRefetchItems(contract.deleteItem),
   }
 }
 
