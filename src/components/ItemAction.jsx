@@ -1,11 +1,28 @@
 import {
   Button,
-  SymbolDiamondIcon,
+  Pane,
+  SendToIcon,
   TickIcon,
   TrashIcon,
 } from 'evergreen-ui'
 import useTodoContract from '../hooks/useTodoContract'
 import statusEnum from '../enums/status'
+
+const IconButton = ({ icon, ...props }) => (
+  <Button
+    iconBefore={
+      <Pane
+        display="flex"
+        marginRight={-4}
+        paddingLeft={4}
+
+      >
+        {icon}
+      </Pane>
+    }
+    {...props}
+  />
+)
 
 const ItemAction = ({
   assignee,
@@ -26,18 +43,19 @@ const ItemAction = ({
     case statusEnum.CREATED: {
       return (
         <>
-          <Button
+          <IconButton
             disabled={!isOwner}
-            iconBefore={TrashIcon}
+            icon={<TrashIcon />}
             marginRight={8}
             intent="danger"
             onClick={() => deleteItem(idx)}
             children="Delete"
           />
-          <Button
+          <IconButton
             disabled={!isAssignee}
-            iconBefore={TickIcon}
+            icon={<TickIcon />}
             onClick={() => completeItem(idx)}
+            intent="success"
             children="Complete"
           />
         </>
@@ -45,10 +63,11 @@ const ItemAction = ({
     }
     case statusEnum.COMPLETED: {
       return (
-        <Button
+        <IconButton
           disabled={!isOwner}
-          iconBefore={SymbolDiamondIcon}
+          icon={<SendToIcon />}
           children="Confirm & Pay"
+          intent="success"
           onClick={() => confirmItem(idx, price)}
         />
       )

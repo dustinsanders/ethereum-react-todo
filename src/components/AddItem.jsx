@@ -48,7 +48,6 @@ const AddItem = () => {
       <Button
         appearance="primary"
         iconBefore={EditIcon}
-        width="100%"
         onClick={() => setOpen(true)}
         disabled={!isOwner}
       >

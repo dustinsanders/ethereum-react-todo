@@ -4,7 +4,10 @@ import {
   Pane,
   Text,
 } from 'evergreen-ui'
+import AddItem from './AddItem'
 import useTodoContract from '../hooks/useTodoContract'
+
+export const height = 115
 
 const Header = () => {
   const { owner } = useTodoContract()
@@ -12,19 +15,23 @@ const Header = () => {
   return (
     <Pane
       display="flex"
-      paddingX={16}
-      paddingY={48}
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      paddingX={128}
+      paddingTop={36}
+      paddingBottom={16}
       marginTop={-10}
-      marginX={-32}
       background="gray100"
       borderRadius={3}
-      alignItems="center"
-      justifyContent="center"
       elevation={4}
+      height={height}
     >
       <Text>Todo Board for:</Text>
-      &nbsp;
       <Heading size={600}>{owner}</Heading>
+      <Pane marginY={8}>
+        <AddItem />
+      </Pane>
     </Pane>
   )
 }

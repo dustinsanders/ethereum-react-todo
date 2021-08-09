@@ -1,10 +1,12 @@
+/* eslint-disable jest/valid-expect */
+
 const { expect } = require('chai')
-const { utils } = require('ethers')
 const { ethers } = require('hardhat')
 
 const {
   parseBytes32String,
   formatBytes32String,
+  parseUnits,
 } = ethers.utils
 
 const deployTodo = async () => {
@@ -70,6 +72,18 @@ describe.only('Todo Contract', () => {
     expect(await todo.items(0)).to.have.property('status', 3)
   })
 
+  it('should revert when trying to delete and status is not created', async () => {
+    const todo = await deployTodo()
+    const assignee = await getSigner(0)
+    await addItem(todo, { assignee: assignee.address })
+    await todo
+      .connect(assignee)
+      .completeItem(0)
+
+    await expect(todo.deleteItem(0))
+      .to.be.revertedWith('Incorrect status to delete item')
+  })
+
   it('should revert if non-owner tries to delete item', async () => {
     const todo = await deployTodo()
     await addItem(todo)
@@ -98,27 +112,49 @@ describe.only('Todo Contract', () => {
       .to.be.revertedWith('Only the assignee can complete the task')
   })
 
+  it('should revert when trying to complete and status is not created', async () => {
+    const todo = await deployTodo()
+    const assignee = await getSigner(0)
+    await addItem(todo, { assignee: assignee.address })
+    await todo.deleteItem(0)
+
+    await expect(todo.connect(assignee).completeItem(0))
+      .to.be.revertedWith('Incorrect status to complete item')
+  })
+
   it('should allow owner to confirm and pay for item after assignee has completed it', async () => {
     const todo = await deployTodo()
-    const price = 1_000_000
+    const price = parseUnits('1.0')
     const assignee = await getSigner(1)
     await addItem(todo, { price, assignee: assignee.address })
     await todo.connect(assignee).completeItem(0)
 
-    const balance = await assignee.getBalance()
-    console.log(utils.formatEther(balance))
-
+    const before = await assignee.getBalance()
     await todo.confirmItem(0, { value: price })
+    const after = await assignee.getBalance()
 
     expect(await todo.items(0)).to.have.property('status', 2)
-    // console.log('after', BigNumber.from(await assignee.getBalance()))
-    const balanceAfter = await assignee.getBalance()
-    console.log(utils.formatEther(balanceAfter))
+    expect(after.sub(before).eq(price)).to.equal(true)
   })
 
-  // it('should transfer funds')
-  // it('should revert item confirmation if not complete yet', async () => {}
-  // it('should revert item confirmation if exact amount is not sent', async () => {}
-  // it('should revert item confirmation if already confirmed', async () => {}
-  // it('should be locked from changes if deleted)
+  it('should revert when trying to confirm and status is not completed', async () => {
+    const todo = await deployTodo()
+    const price = 1_000_000
+    await addItem(todo, { price })
+    await todo.deleteItem(0)
+
+    await expect(todo.confirmItem(0, { value: price }))
+      .to.be.revertedWith('Incorrect status to confirm item')
+  })
+
+  it('should revert item confirmation if exact amount is not sent', async () => {
+    const todo = await deployTodo()
+    const price = parseUnits('1.0')
+    const assignee = await getSigner(1)
+    await addItem(todo, { price, assignee: assignee.address })
+    await todo.connect(assignee).completeItem(0)
+
+    await expect(todo.confirmItem(0, { value: parseUnits('1.1') }))
+      .to.be.revertedWith('Only full payments accepted')
+  })
 })

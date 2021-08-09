@@ -43,7 +43,7 @@ contract Todo is Ownable {
 
   function confirmItem(uint _idx) public payable onlyOwner {
     require(items[_idx].status == Status.COMPLETED, "Incorrect status to confirm item");
-    require(items[_idx].price == msg.value, "Only full payments accepted.");
+    require(items[_idx].price == msg.value, "Only full payments accepted");
 
     ( bool success, ) = address(items[_idx].assignee).call{value:msg.value}("");
     require(success, "Transfer failed.");

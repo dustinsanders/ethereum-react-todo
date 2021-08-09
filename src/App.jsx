@@ -1,7 +1,6 @@
 import { Pane } from 'evergreen-ui'
-import AddItem from './components/AddItem'
 import Container from '@material-ui/core/Container'
-import Header from './components/Header'
+import Header, { height } from './components/Header'
 import Items from './components/Items'
 import PageSpinner from './components/PageSpinner'
 import useTodoContract from './hooks/useTodoContract'
@@ -19,21 +18,33 @@ const App = () => {
 
   return (
     <>
+    <Pane
+      position="fixed"
+      width="100%"
+      marginBottom={150}
+      top={0}
+      left={0}
+      zIndex={10}
+    >
+      <Pane
+        display="flex"
+        justifyContent="center"
+      >
+        <Header />
+      </Pane>
+    </Pane>
     <Container maxWidth="sm">
-      <Header />
-      <br />
       <Pane
         alignItems="center"
         display="flex"
         flexDirection="column"
+        marginTop={height + 16}
       >
-        <AddItem />
-        <hr />
         <Items items={items} selectedAddress={selectedAddress} />
       </Pane>
     </Container>
     </>
-  );
+  )
 }
 
 export default App;
