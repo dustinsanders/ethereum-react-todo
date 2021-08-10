@@ -24,6 +24,7 @@ const useTodoContract =  () => {
   const initialize = useCallback(async () => {
     updateState({ loading: true })
     const provider = await detectEthereumProvider()
+    await window.ethereum.request({ method: 'eth_requestAccounts' })
 
     window.ethereum.on('accountsChanged', (accounts) => {
       window.location.reload()
