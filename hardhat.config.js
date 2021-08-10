@@ -10,10 +10,10 @@ module.exports = {
     artifacts: './src/artifacts',
   },
   networks: {
-    testnet: {
-      url: process.env.ALCHEMY_URL,
-      accounts: [`0x${process.env.METAMASK_PRIVATE_KEY || ''}`],
-    },
+    // testnet: {
+    //   url: process.env.ALCHEMY_URL,
+    //   accounts: [`0x${process.env.METAMASK_PRIVATE_KEY || ''}`],
+    // },
     hardhat: {
       chainId: 1337,
     }
