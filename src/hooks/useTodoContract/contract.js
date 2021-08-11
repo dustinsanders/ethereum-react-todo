@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 import Todo from '../../artifacts/contracts/Todo.sol/Todo.json'
-import get from 'lodash/get'
 
 const {
   formatBytes32String,
