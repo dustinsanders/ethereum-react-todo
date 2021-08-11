@@ -2,6 +2,7 @@ import { Pane } from 'evergreen-ui'
 import Container from '@material-ui/core/Container'
 import Header, { height } from './components/Header'
 import Items from './components/Items'
+import NoProvider from './components/NoProvider'
 import PageSpinner from './components/PageSpinner'
 import useTodoContract from './hooks/useTodoContract'
 
@@ -9,8 +10,17 @@ const App = () => {
   const {
     items,
     loading,
+    noProvider,
     selectedAddress,
   } = useTodoContract()
+
+  if (noProvider) {
+    return (
+      <Container maxWidth="sm">
+        <NoProvider />
+      </Container>
+    )
+  }
 
   if (loading) {
     return <PageSpinner />

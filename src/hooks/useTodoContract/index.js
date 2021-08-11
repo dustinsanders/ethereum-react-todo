@@ -9,6 +9,7 @@ const initialState = {
   items: null,
   owner: null,
   selectedAddress: null,
+  noProvider: false,
 }
 
 const useTodoState = createGlobalState(() => initialState)
@@ -24,6 +25,14 @@ const useTodoContract =  () => {
   const initialize = useCallback(async () => {
     updateState({ loading: true })
     const provider = await detectEthereumProvider()
+
+    if (!provider) {
+      return updateState({
+        loading: false,
+        noProvider: true,
+      })
+    }
+
     await window.ethereum.request({ method: 'eth_requestAccounts' })
 
     window.ethereum.on('accountsChanged', (accounts) => {
