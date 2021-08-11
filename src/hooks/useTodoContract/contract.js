@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import Todo from '../../artifacts/contracts/Todo.sol/Todo.json'
+import get from 'lodash/get'
 
 const {
   formatBytes32String,
@@ -8,12 +9,13 @@ const {
   parseEther,
 } = ethers.utils
 
-// const todoAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
-const todoAddress = "0xbeE59406e18Cd8E4bBeC8402Bf40CDBD38076000"
+const defaultTodoAddress = "0xbeE59406e18Cd8E4bBeC8402Bf40CDBD38076000"
 
 const getTodoInstance = (withSigner = false) => {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const todoAddress = (new URLSearchParams(window.location.search)).get('address')
+      || defaultTodoAddress
 
     return new ethers.Contract(
       todoAddress,
