@@ -9,7 +9,7 @@ const initialState = {
   items: null,
   owner: null,
   selectedAddress: null,
-  noProvider: false,
+  error: false,
 }
 
 const useTodoState = createGlobalState(() => initialState)
@@ -23,36 +23,39 @@ const useTodoContract =  () => {
   }), [state, setState])
 
   const initialize = useCallback(async () => {
-    updateState({ loading: true })
-    const provider = await detectEthereumProvider()
+    try {
+      updateState({ loading: true })
+      const provider = await detectEthereumProvider()
 
-    if (!provider) {
-      return updateState({
+      await window.ethereum.request({ method: 'eth_requestAccounts' })
+
+      window.ethereum.on('accountsChanged', (accounts) => {
+        window.location.reload()
+      })
+
+      const [owner, items] = await Promise.all([
+        contract.owner(),
+        contract.getItems(),
+      ])
+
+      const selectedAddress = get(provider, 'selectedAddress', '')
+
+      updateState({
+        items,
         loading: false,
-        noProvider: true,
+        owner,
+        selectedAddress,
+        isOwner: owner.toLowerCase() === selectedAddress.toLowerCase(),
+      })
+    } catch (e) {
+      console.error(e)
+
+      updateState({
+        loading: false,
+        error: true,
       })
     }
 
-    await window.ethereum.request({ method: 'eth_requestAccounts' })
-
-    window.ethereum.on('accountsChanged', (accounts) => {
-      window.location.reload()
-    })
-
-    const [owner, items] = await Promise.all([
-      contract.owner(),
-      contract.getItems(),
-    ])
-
-    const selectedAddress = get(provider, 'selectedAddress', '')
-
-    updateState({
-      items,
-      loading: false,
-      owner,
-      selectedAddress,
-      isOwner: owner.toLowerCase() === selectedAddress.toLowerCase(),
-    })
   }, [updateState])
 
   const makeRefetchItems = useCallback(

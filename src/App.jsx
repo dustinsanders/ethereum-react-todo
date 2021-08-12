@@ -1,23 +1,23 @@
 import { Pane } from 'evergreen-ui'
 import Container from '@material-ui/core/Container'
 import Header, { height } from './components/Header'
+import ErrorMessage from './components/ErrorMessage'
 import Items from './components/Items'
-import NoProvider from './components/NoProvider'
 import PageSpinner from './components/PageSpinner'
 import useTodoContract from './hooks/useTodoContract'
 
 const App = () => {
   const {
+    error,
     items,
     loading,
-    noProvider,
     selectedAddress,
   } = useTodoContract()
 
-  if (noProvider) {
+  if (error) {
     return (
       <Container maxWidth="sm">
-        <NoProvider />
+        <ErrorMessage />
       </Container>
     )
   }
