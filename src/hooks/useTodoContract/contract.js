@@ -8,16 +8,28 @@ const {
   parseEther,
 } = ethers.utils
 
+let address = null
 const defaultTodoAddress = "0xbeE59406e18Cd8E4bBeC8402Bf40CDBD38076000"
+
+const initAddress = async () => {
+  try {
+    const response = await fetch('/.netlify/functions/address')
+    const { value } = await response.json()
+
+    address = value
+  } catch (e) {
+    console.error(e)
+
+    address = defaultTodoAddress
+  }
+}
 
 const getTodoInstance = (withSigner = false) => {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const todoAddress = (new URLSearchParams(window.location.search)).get('address')
-      || defaultTodoAddress
 
     return new ethers.Contract(
-      todoAddress,
+      address,
       Todo.abi,
       withSigner ?  provider.getSigner() : provider,
     )
@@ -72,6 +84,7 @@ const contract = {
   confirmItem,
   deleteItem,
   getItems,
+  initAddress,
   isSameAddress,
 }
 

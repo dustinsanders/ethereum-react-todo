@@ -25,7 +25,7 @@ const useTodoContract =  () => {
     try {
       updateState({ loading: true })
       const provider = await detectEthereumProvider()
-
+      await contract.initAddress()
       await window.ethereum.request({ method: 'eth_requestAccounts' })
 
       window.ethereum.on('accountsChanged', (accounts) => {
