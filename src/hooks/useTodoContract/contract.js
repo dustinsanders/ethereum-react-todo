@@ -26,14 +26,10 @@ const getTodoInstance = (withSigner = false) => {
   }
 }
 
-const owner = async () => {
-  const todo = getTodoInstance()
-  const owner = await todo.owner()
+const isSameAddress = (addr1, addr2) =>
+  addr1.toLowerCase() === addr2.toLowerCase()
 
-  return owner
-}
-
-const getItems = async () => {
+const getItems = async selectedAddress => {
   const todo = getTodoInstance()
   const items = await todo.getItems()
 
@@ -42,6 +38,8 @@ const getItems = async () => {
       ...entry,
       title: parseBytes32String(entry.title),
       priceInEth: formatEther(entry.price),
+      isOwner: isSameAddress(selectedAddress, entry.owner),
+      isAssignee: isSameAddress(selectedAddress, entry.assignee),
     }))
 }
 
@@ -59,14 +57,14 @@ const addItem = async ({ title, price, assignee }) =>
     assignee.toLowerCase(),
   ))
 
-const completeItem = async idx =>
-  performTransaction(async todo => todo.completeItem(idx))
+const completeItem = async id =>
+  performTransaction(async todo => todo.completeItem(id))
 
-const confirmItem = async (idx, price) =>
-  performTransaction(async todo => todo.confirmItem(idx, { value: price }))
+const confirmItem = async (id, price) =>
+  performTransaction(async todo => todo.confirmItem(id, { value: price }))
 
-const deleteItem = async (idx) =>
-  performTransaction(async todo => todo.deleteItem(idx))
+const deleteItem = async (id) =>
+  performTransaction(async todo => todo.deleteItem(id))
 
 const contract = {
   addItem,
@@ -74,7 +72,7 @@ const contract = {
   confirmItem,
   deleteItem,
   getItems,
-  owner,
+  isSameAddress,
 }
 
 export default contract

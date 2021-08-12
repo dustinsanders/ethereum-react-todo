@@ -7,7 +7,6 @@ import get from 'lodash/get'
 const initialState = {
   loading: true,
   items: null,
-  owner: null,
   selectedAddress: null,
   error: false,
 }
@@ -33,19 +32,13 @@ const useTodoContract =  () => {
         window.location.reload()
       })
 
-      const [owner, items] = await Promise.all([
-        contract.owner(),
-        contract.getItems(),
-      ])
-
       const selectedAddress = get(provider, 'selectedAddress', '')
+      const items = await contract.getItems(selectedAddress)
 
       updateState({
         items,
         loading: false,
-        owner,
         selectedAddress,
-        isOwner: owner.toLowerCase() === selectedAddress.toLowerCase(),
       })
     } catch (e) {
       console.error(e)
@@ -62,11 +55,11 @@ const useTodoContract =  () => {
     action =>
       async (...args) => {
         await action(...args)
-        const items = await contract.getItems()
+        const items = await contract.getItems(state.selectedAddress)
 
         updateState({ items})
       },
-    [updateState],
+    [updateState, state.selectedAddress],
   )
 
   useEffectOnce(() => {
@@ -81,6 +74,7 @@ const useTodoContract =  () => {
     completeItem: makeRefetchItems(contract.completeItem),
     confirmItem: makeRefetchItems(contract.confirmItem),
     deleteItem: makeRefetchItems(contract.deleteItem),
+    isSameAddress: contract.isSameAddress,
   }
 }
 

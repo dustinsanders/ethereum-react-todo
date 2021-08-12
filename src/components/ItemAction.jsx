@@ -26,18 +26,18 @@ const IconButton = ({ icon, ...props }) => (
 
 const ItemAction = ({
   assignee,
-  idx,
+  id,
+  owner,
   price,
   status,
+  isAssignee,
+  isOwner,
 }) => {
   const {
     completeItem,
     confirmItem,
     deleteItem,
-    isOwner,
-    selectedAddress,
   } = useTodoContract()
-  const isAssignee = selectedAddress.toLowerCase() === assignee.toLowerCase()
 
   switch (status) {
     case statusEnum.CREATED: {
@@ -48,13 +48,13 @@ const ItemAction = ({
             icon={<TrashIcon />}
             marginRight={8}
             intent="danger"
-            onClick={() => deleteItem(idx)}
+            onClick={() => deleteItem(id)}
             children="Delete"
           />
           <IconButton
             disabled={!isAssignee}
             icon={<TickIcon />}
-            onClick={() => completeItem(idx)}
+            onClick={() => completeItem(id)}
             intent="success"
             children="Complete"
           />
@@ -68,7 +68,7 @@ const ItemAction = ({
           icon={<SendToIcon />}
           children="Confirm & Pay"
           intent="success"
-          onClick={() => confirmItem(idx, price)}
+          onClick={() => confirmItem(id, price)}
         />
       )
     }
