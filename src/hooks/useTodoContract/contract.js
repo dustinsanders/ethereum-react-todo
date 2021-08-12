@@ -9,7 +9,7 @@ const {
 } = ethers.utils
 
 let address = null
-const defaultTodoAddress = "0xbeE59406e18Cd8E4bBeC8402Bf40CDBD38076000"
+const defaultTodoAddress = "0x2417A0995dd4929F1466dc65710B8338d3252cb8"
 
 const initAddress = async () => {
   try {
