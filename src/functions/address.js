@@ -27,7 +27,8 @@ exports.handler = async ({ queryStringParameters }) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      value: getValue(queryStringParameters)
+      value: getValue(queryStringParameters),
+      env: process.env.NODE_ENV,
     })
   }
 }
