@@ -2,6 +2,7 @@ const safeRequire = require('safe-require')
 const local = safeRequire('./config/local')
 const testnet = require('./config/testnet')
 const get = require('lodash/get')
+const { utils } = require('ethers')
 
 const getValue = queryStringParameters => {
   const {
@@ -13,7 +14,7 @@ const getValue = queryStringParameters => {
     return testnet
   }
 
-  if (CONTRACT_ADDRESS) {
+  if (CONTRACT_ADDRESS && utils.isAddress(CONTRACT_ADDRESS)) {
     return CONTRACT_ADDRESS
   }
 

@@ -30,7 +30,7 @@
   "scripts": {
     "dev": "netlify dev",
     "start": "react-scripts start",
-    "build": "yarn compile:contracts && react-scripts build",
+    "build": "yarn compile:contracts && react-scripts build && cp _redirects build/",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "compile:contracts": "hardhat compile",
