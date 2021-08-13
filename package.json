@@ -27,6 +27,7 @@
     "react-use": "^17.2.4"
   },
   "scripts": {
+    "dev": "netlify dev",
     "start": "react-scripts start",
     "build": "yarn compile:contracts && react-scripts build",
     "test": "react-scripts test",

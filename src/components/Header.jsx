@@ -10,7 +10,7 @@ import useTodoContract from '../hooks/useTodoContract'
 export const height = 115
 
 const Header = () => {
-  const { owner } = useTodoContract()
+  const { selectedAddress } = useTodoContract()
 
   return (
     <Pane
@@ -28,7 +28,7 @@ const Header = () => {
       height={height}
     >
       <Text>Todo Board for:</Text>
-      <Heading size={600}>{owner}</Heading>
+      <Heading size={600}>{selectedAddress}</Heading>
       <Pane marginY={8}>
         <AddItem />
       </Pane>

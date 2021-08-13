@@ -1,53 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-contract Todo is Ownable {
-  Item[] public items;
+contract Todo {
   enum Status{ CREATED, COMPLETED, CONFIRMED, DELETED }
 
   struct Item {
+    uint id;
     bytes32 title;
     uint256 price;
+    address owner;
     address assignee;
     Status status;
   }
 
-  // TODO
-  // mapping(address => Item[]) items;
+  uint private idCounter;
+  mapping(uint => Item) private items;
+  mapping(address => uint[]) private itemAccess;
 
   modifier onlyAssignee(uint _idx) {
-    require(msg.sender == items[_idx].assignee, "Only the assignee can complete the task");
+    require(msg.sender == items[_idx].assignee, "Assignable: caller is not the assignee");
 
     _;
   }
 
-  function addItem(bytes32 _title, uint _itemPrice, address _assignee) public onlyOwner {
-    items.push(Item(_title, _itemPrice, _assignee, Status.CREATED));
+  modifier onlyOwner(uint _id) {
+    require(msg.sender == items[_id].owner, "Ownable: caller is not the owner");
+
+    _;
+  }
+
+  modifier onlyOwnerOrAssignee(uint _id) {
+    require(
+      msg.sender == items[_id].owner || msg.sender == items[_id].assignee,
+      "Ownable/Assignable: caller is not the owner or assignee"
+    );
+
+    _;
+  }
+
+  function getItem(uint _id) public view onlyOwnerOrAssignee(_id) returns(Item memory) {
+    return items[_id];
   }
 
   function getItems() public view returns(Item[] memory) {
-    return items;
+    uint length = itemAccess[msg.sender].length;
+    Item[] memory userItems = new Item[](length);
+
+    for (uint i=0; i < length; i++) {
+      userItems[i] = items[itemAccess[msg.sender][i]];
+    }
+
+    return userItems;
   }
 
-  function deleteItem(uint _idx) public onlyOwner {
-    require(items[_idx].status == Status.CREATED, "Incorrect status to delete item");
-    items[_idx].status = Status.DELETED;
+  function addItem(bytes32 _title, uint _itemPrice, address _assignee) public {
+    require(msg.sender != _assignee, "Item cannot be assigned to owner");
+    items[idCounter] = Item(idCounter, _title, _itemPrice, msg.sender, _assignee, Status.CREATED);
+    itemAccess[msg.sender].push(idCounter);
+    itemAccess[_assignee].push(idCounter);
+    idCounter++;
   }
 
-  function completeItem(uint _idx) public onlyAssignee(_idx) {
-    require(items[_idx].status == Status.CREATED, "Incorrect status to complete item");
-    items[_idx].status = Status.COMPLETED;
+  function deleteItem(uint _id) public onlyOwner(_id) {
+    require(items[_id].status == Status.CREATED, "Incorrect status to delete item");
+    items[_id].status = Status.DELETED;
   }
 
-  function confirmItem(uint _idx) public payable onlyOwner {
-    require(items[_idx].status == Status.COMPLETED, "Incorrect status to confirm item");
-    require(items[_idx].price == msg.value, "Only full payments accepted");
+  function completeItem(uint _id) public onlyAssignee(_id) {
+    require(items[_id].status == Status.CREATED, "Incorrect status to complete item");
+    items[_id].status = Status.COMPLETED;
+  }
 
-    ( bool success, ) = address(items[_idx].assignee).call{value:msg.value}("");
+  function confirmItem(uint _id) public payable onlyOwner(_id) {
+    require(items[_id].status == Status.COMPLETED, "Incorrect status to confirm item");
+    require(items[_id].price == msg.value, "Only full payments accepted");
+
+    ( bool success, ) = address(items[_id].assignee).call{value:msg.value}("");
     require(success, "Transfer failed.");
 
-    items[_idx].status = Status.CONFIRMED;
+    items[_id].status = Status.CONFIRMED;
   }
 }

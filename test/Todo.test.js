@@ -36,13 +36,7 @@ const addItem = async (todo, { title, price, assignee } = {}, signerIdx) =>
       assignee || await getAddress(1),
     )
 
-describe.only('Todo Contract', () => {
-  it('should set the sender as the owner', async () => {
-    const todo = await deployTodo()
-
-    expect(await todo.owner()).to.equal(await getAddress(0))
-  })
-
+describe('Todo Contract', () => {
   it('should be able to add a item to the list', async () => {
     const todo = await deployTodo()
     const itemOptions = {
@@ -51,17 +45,12 @@ describe.only('Todo Contract', () => {
       assignee: await getAddress(1),
     }
     await addItem(todo, itemOptions)
-    const item = await todo.items(0)
+    const item = await todo.getItem(0)
 
     expect(parseBytes32String(item.title)).to.equal(itemOptions.title)
     expect(item.price).to.equal(itemOptions.price)
     expect(item.assignee).to.equal(itemOptions.assignee)
-  })
-
-  it('should allow owner to create items', async () => {
-    const todo = await deployTodo()
-    await expect(addItem(todo, {}, 1))
-      .to.be.revertedWith('Ownable: caller is not the owner')
+    expect(item.owner).to.equal((await getSigner(0)).address)
   })
 
   it('should allow owner to delete items', async () => {
@@ -69,7 +58,7 @@ describe.only('Todo Contract', () => {
     await addItem(todo)
     await todo.deleteItem(0)
 
-    expect(await todo.items(0)).to.have.property('status', 3)
+    expect(await todo.getItem(0)).to.have.property('status', 3)
   })
 
   it('should revert when trying to delete and status is not created', async () => {
@@ -101,7 +90,7 @@ describe.only('Todo Contract', () => {
       .connect(assignee)
       .completeItem(0)
 
-    expect(await todo.items(0)).to.have.property('status', 1)
+    expect(await todo.getItem(0)).to.have.property('status', 1)
   })
 
   it('should revert if non-assignee tries to complete item', async () => {
@@ -109,7 +98,7 @@ describe.only('Todo Contract', () => {
     await addItem(todo)
 
     await expect(todo.completeItem(0))
-      .to.be.revertedWith('Only the assignee can complete the task')
+      .to.be.revertedWith('Assignable: caller is not the assignee')
   })
 
   it('should revert when trying to complete and status is not created', async () => {
@@ -133,7 +122,7 @@ describe.only('Todo Contract', () => {
     await todo.confirmItem(0, { value: price })
     const after = await assignee.getBalance()
 
-    expect(await todo.items(0)).to.have.property('status', 2)
+    expect(await todo.getItem(0)).to.have.property('status', 2)
     expect(after.sub(before).eq(price)).to.equal(true)
   })
 
@@ -156,5 +145,48 @@ describe.only('Todo Contract', () => {
 
     await expect(todo.confirmItem(0, { value: parseUnits('1.1') }))
       .to.be.revertedWith('Only full payments accepted')
+  })
+
+  it('retrieve items associated to the caller', async () => {
+    const todo = await deployTodo()
+
+    const owner = await getSigner(0)
+    const assignee = await getSigner(1)
+    const otherAddress = await getSigner(2)
+
+    const owned = { assignee: assignee.address, title: 'item 1' }
+    const noAssociation = { assignee: otherAddress.address, title: 'item 2' }
+    const assigned = { assignee: owner.address, title: 'item 3' }
+
+    await addItem(todo, owned)
+    await addItem(todo, noAssociation, 1)
+    await addItem(todo, assigned, 1)
+
+    const items = await todo.getItems()
+
+    expect(items).to.have.lengthOf(2)
+    expect(parseBytes32String(items[0].title)).to.equal(owned.title)
+    expect(items[0].owner).to.equal(owner.address)
+    expect(parseBytes32String(items[1].title)).to.equal(assigned.title)
+    expect(items[1].assignee).to.equal(owner.address)
+  })
+
+  it('should revert if trying to access item without association', async () => {
+    const todo = await deployTodo()
+
+    const otherAddress = await getSigner(2)
+
+    await addItem(todo, { assignee: otherAddress.address }, 1)
+
+    await expect(todo.getItem(0))
+      .to.be.revertedWith('Ownable/Assignable: caller is not the owner or assignee')
+  })
+
+  it('should revert if the assignee is the same as owner', async () => {
+    const todo = await deployTodo()
+    const owner = await getSigner(0)
+
+    await expect(addItem(todo, { assignee: owner.address }))
+      .to.be.revertedWith('Item cannot be assigned to owner')
   })
 })

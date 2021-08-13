@@ -13,7 +13,7 @@ import toNumber from 'lodash/toNumber'
 const minimumPrice = .01
 
 const AddItem = () => {
-  const { addItem, isOwner } = useTodoContract()
+  const { addItem, isSameAddress, selectedAddress } = useTodoContract()
 
   const [assignee, setAssignee] = useState('')
   const [title, setTitle] = useState('')
@@ -22,7 +22,7 @@ const AddItem = () => {
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
 
   const titleValid = title.length >= 3
-  const assigneeValid = utils.isAddress(assignee)
+  const assigneeValid = utils.isAddress(assignee) && !isSameAddress(assignee, selectedAddress)
   const priceValid = typeof toNumber(price) === 'number'
     && toNumber(price) >= minimumPrice
   const isConfirmDisabled = !(titleValid && assigneeValid && priceValid)
@@ -49,7 +49,6 @@ const AddItem = () => {
         appearance="primary"
         iconBefore={EditIcon}
         onClick={() => setOpen(true)}
-        disabled={!isOwner}
       >
         Add New Item
       </Button>
@@ -80,7 +79,7 @@ const AddItem = () => {
             placeholder="0x..."
             value={assignee}
             isInvalid={!assigneeValid}
-            onChange={evt => setAssignee(evt.target.value)}
+            onChange={evt => setAssignee(evt.target.value.toLowerCase())}
           />
           <TextInputField
             {...textInputFieldProps}

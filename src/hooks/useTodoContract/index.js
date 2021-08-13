@@ -7,9 +7,8 @@ import get from 'lodash/get'
 const initialState = {
   loading: true,
   items: null,
-  owner: null,
   selectedAddress: null,
-  noProvider: false,
+  error: false,
 }
 
 const useTodoState = createGlobalState(() => initialState)
@@ -23,47 +22,44 @@ const useTodoContract =  () => {
   }), [state, setState])
 
   const initialize = useCallback(async () => {
-    updateState({ loading: true })
-    const provider = await detectEthereumProvider()
+    try {
+      updateState({ loading: true })
+      const provider = await detectEthereumProvider()
+      await contract.initAddress()
+      await window.ethereum.request({ method: 'eth_requestAccounts' })
 
-    if (!provider) {
-      return updateState({
+      window.ethereum.on('accountsChanged', (accounts) => {
+        window.location.reload()
+      })
+
+      const selectedAddress = get(provider, 'selectedAddress', '')
+      const items = await contract.getItems(selectedAddress)
+
+      updateState({
+        items,
         loading: false,
-        noProvider: true,
+        selectedAddress,
+      })
+    } catch (e) {
+      console.error(e)
+
+      updateState({
+        loading: false,
+        error: true,
       })
     }
 
-    await window.ethereum.request({ method: 'eth_requestAccounts' })
-
-    window.ethereum.on('accountsChanged', (accounts) => {
-      window.location.reload()
-    })
-
-    const [owner, items] = await Promise.all([
-      contract.owner(),
-      contract.getItems(),
-    ])
-
-    const selectedAddress = get(provider, 'selectedAddress', '')
-
-    updateState({
-      items,
-      loading: false,
-      owner,
-      selectedAddress,
-      isOwner: owner.toLowerCase() === selectedAddress.toLowerCase(),
-    })
   }, [updateState])
 
   const makeRefetchItems = useCallback(
     action =>
       async (...args) => {
         await action(...args)
-        const items = await contract.getItems()
+        const items = await contract.getItems(state.selectedAddress)
 
         updateState({ items})
       },
-    [updateState],
+    [updateState, state.selectedAddress],
   )
 
   useEffectOnce(() => {
@@ -78,6 +74,7 @@ const useTodoContract =  () => {
     completeItem: makeRefetchItems(contract.completeItem),
     confirmItem: makeRefetchItems(contract.confirmItem),
     deleteItem: makeRefetchItems(contract.deleteItem),
+    isSameAddress: contract.isSameAddress,
   }
 }
 
