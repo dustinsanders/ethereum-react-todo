@@ -12,7 +12,6 @@ import statusEnum from '../enums/status'
 const Item = props => (
   <Card
     elevation={1}
-    key={props.id}
     width="100%"
     height={120}
     marginY={8}

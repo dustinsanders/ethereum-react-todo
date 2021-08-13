@@ -1,4 +1,31 @@
-exports.handler = async () => ({
-  statusCode: 200,
-  body: JSON.stringify({ value: process.env.CONTRACT_ADDRESS })
-})
+const local = require('./config/local')
+const testnet = require('./config/testnet')
+const get = require('lodash/get')
+
+const getValue = queryStringParameters => {
+  const {
+    CONTRACT_ADDRESS,
+    NODE_ENV,
+  } = process.env
+
+  if (get(queryStringParameters, 'net') === 'testnet') {
+    return testnet
+  }
+
+  if (CONTRACT_ADDRESS) {
+    return CONTRACT_ADDRESS
+  }
+
+  return NODE_ENV === 'production'
+    ? testnet
+    : local
+}
+
+exports.handler = async ({ queryStringParameters }) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      value: getValue(queryStringParameters)
+    })
+  }
+}

@@ -5,3 +5,5 @@ artifacts
 TODO.md
 .DS_Store
 build
+
+src/functions/config/local.js

@@ -19,7 +19,7 @@ const Items = () => {
   }
 
   return items.map(item => (
-    <Item key={item.id} {...item} />
+    <Item key={item.id.toString()} {...item} />
   ))
 }
 

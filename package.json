@@ -33,9 +33,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "compile:contracts": "hardhat compile",
-    "start:localnode": "hardhat node",
-    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
-    "deploy:testnet": "hardhat run scripts/deploy.js --network testnet",
+    "start:localnode": "yarn compile:contracts && hardhat node",
+    "deploy:local": "yarn compile:contracts && hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "yarn compile:contracts && hardhat run scripts/deploy.js --network testnet",
     "test:contracts": "hardhat test"
   },
   "eslintConfig": {
