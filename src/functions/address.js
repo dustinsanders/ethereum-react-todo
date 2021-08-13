@@ -23,12 +23,15 @@
 //     : local
 // }
 
-exports.handler = async ({ queryStringParameters }) => {
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+
+exports.handler = async ({ queryStringParameters }, context) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
       // value: getValue(queryStringParameters),
-      env: process.env.NODE_ENV,
+      env: Object.keys(process.env),
+      context: Object.keys(process.env),
     })
   }
 }
