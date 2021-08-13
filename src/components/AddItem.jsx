@@ -10,7 +10,7 @@ import { utils } from 'ethers'
 import useTodoContract from '../hooks/useTodoContract'
 import toNumber from 'lodash/toNumber'
 
-const minimumPrice = .01
+const minimumPrice = .0001
 
 const AddItem = () => {
   const { addItem, isSameAddress, selectedAddress } = useTodoContract()
@@ -79,14 +79,14 @@ const AddItem = () => {
             placeholder="0x..."
             value={assignee}
             isInvalid={!assigneeValid}
-            onChange={evt => setAssignee(evt.target.value.toLowerCase())}
+            onChange={evt => setAssignee(evt.target.value)}
           />
           <TextInputField
             {...textInputFieldProps}
             label="Price(ETH)"
             value={price}
             isInvalid={!priceValid}
-            description={`Must be minimum of ${minimumPrice}(ETH)`}
+            description={`minimum of ${minimumPrice}(ETH)`}
             onChange={evt => setPrice(evt.target.value)}
           />
         </Pane>

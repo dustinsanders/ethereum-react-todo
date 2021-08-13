@@ -8,19 +8,18 @@ const {
   parseEther,
 } = ethers.utils
 
-let address = null
-const defaultTodoAddress = "0x2417A0995dd4929F1466dc65710B8338d3252cb8"
-
+let contractAddress = null
 const initAddress = async () => {
   try {
-    const response = await fetch('/.netlify/functions/address')
+    const net = window.location.pathname.split('/')[1]
+    const queryParam = net !== '' ? `?net=${net}` : ''
+    const response = await fetch(`/.netlify/functions/address${queryParam}`)
     const { value } = await response.json()
 
-    address = value
+    contractAddress = value
+    console.info(`Using contract address: ${contractAddress}`)
   } catch (e) {
     console.error(e)
-
-    address = defaultTodoAddress
   }
 }
 
@@ -29,7 +28,7 @@ const getTodoInstance = (withSigner = false) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
 
     return new ethers.Contract(
-      address,
+      contractAddress,
       Todo.abi,
       withSigner ?  provider.getSigner() : provider,
     )
@@ -42,10 +41,10 @@ const isSameAddress = (addr1, addr2) =>
   addr1.toLowerCase() === addr2.toLowerCase()
 
 const getItems = async selectedAddress => {
-  const todo = getTodoInstance()
-  const items = await todo.getItems()
+  const todo = getTodoInstance(true)
+  const items = await todo.getItemsAtAddress(selectedAddress)
 
-  return items
+  const parsed = items
     .map(entry => ({
       ...entry,
       title: parseBytes32String(entry.title),
@@ -53,6 +52,8 @@ const getItems = async selectedAddress => {
       isOwner: isSameAddress(selectedAddress, entry.owner),
       isAssignee: isSameAddress(selectedAddress, entry.assignee),
     }))
+
+  return parsed
 }
 
 const performTransaction = async operation => {

@@ -2,10 +2,10 @@
 
 Simple todo contract and react front-end. Allows the connected address to create and assignee todo items. Assignee is able to complete and then get paid for items.
 
-## Demo on Ropsten Network
-[https://eth-todo.netlify.app](https://eth-todo.netlify.app)
+## Demo
+Ropsten: [https://eth-todo.netlify.app](https://eth-todo.netlify.app)
 
-[Ropsten Faucet](https://faucet.ropsten.be/)
+Click [here](https://app.mycrypto.com/faucet) for testnet Ether
 
 ## Running locally
 Install Dependencies
@@ -15,18 +15,12 @@ yarn install
 
 Run local hardhat node
 ```console
-yarn compile:contracts
 yarn start:localnode
 ```
 
-Deploy locally and get contract address
+Deploy locally and generate local config
 ```console
 yarn deploy:local
-```
-
-Add contract address from last step to `.env`
-```
-CONTRACT_ADDRESS=0x...
 ```
 
 Start React App & Netlify Functions

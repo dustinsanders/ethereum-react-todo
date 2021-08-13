@@ -45,7 +45,7 @@ describe('Todo Contract', () => {
       assignee: await getAddress(1),
     }
     await addItem(todo, itemOptions)
-    const item = await todo.getItem(0)
+    const item = await todo.items(0)
 
     expect(parseBytes32String(item.title)).to.equal(itemOptions.title)
     expect(item.price).to.equal(itemOptions.price)
@@ -58,12 +58,12 @@ describe('Todo Contract', () => {
     await addItem(todo)
     await todo.deleteItem(0)
 
-    expect(await todo.getItem(0)).to.have.property('status', 3)
+    expect(await todo.items(0)).to.have.property('status', 3)
   })
 
   it('should revert when trying to delete and status is not created', async () => {
     const todo = await deployTodo()
-    const assignee = await getSigner(0)
+    const assignee = await getSigner(1)
     await addItem(todo, { assignee: assignee.address })
     await todo
       .connect(assignee)
@@ -84,13 +84,13 @@ describe('Todo Contract', () => {
 
   it('should allow assignee to complete items', async () => {
     const todo = await deployTodo()
-    const assignee = await getSigner(0)
+    const assignee = await getSigner(1)
     await addItem(todo, { assignee: assignee.address })
     await todo
       .connect(assignee)
       .completeItem(0)
 
-    expect(await todo.getItem(0)).to.have.property('status', 1)
+    expect(await todo.items(0)).to.have.property('status', 1)
   })
 
   it('should revert if non-assignee tries to complete item', async () => {
@@ -103,7 +103,7 @@ describe('Todo Contract', () => {
 
   it('should revert when trying to complete and status is not created', async () => {
     const todo = await deployTodo()
-    const assignee = await getSigner(0)
+    const assignee = await getSigner(1)
     await addItem(todo, { assignee: assignee.address })
     await todo.deleteItem(0)
 
@@ -122,7 +122,7 @@ describe('Todo Contract', () => {
     await todo.confirmItem(0, { value: price })
     const after = await assignee.getBalance()
 
-    expect(await todo.getItem(0)).to.have.property('status', 2)
+    expect(await todo.items(0)).to.have.property('status', 2)
     expect(after.sub(before).eq(price)).to.equal(true)
   })
 
@@ -162,24 +162,13 @@ describe('Todo Contract', () => {
     await addItem(todo, noAssociation, 1)
     await addItem(todo, assigned, 1)
 
-    const items = await todo.getItems()
+    const items = await todo.getItemsAtAddress(owner.address)
 
     expect(items).to.have.lengthOf(2)
     expect(parseBytes32String(items[0].title)).to.equal(owned.title)
     expect(items[0].owner).to.equal(owner.address)
     expect(parseBytes32String(items[1].title)).to.equal(assigned.title)
     expect(items[1].assignee).to.equal(owner.address)
-  })
-
-  it('should revert if trying to access item without association', async () => {
-    const todo = await deployTodo()
-
-    const otherAddress = await getSigner(2)
-
-    await addItem(todo, { assignee: otherAddress.address }, 1)
-
-    await expect(todo.getItem(0))
-      .to.be.revertedWith('Ownable/Assignable: caller is not the owner or assignee')
   })
 
   it('should revert if the assignee is the same as owner', async () => {
