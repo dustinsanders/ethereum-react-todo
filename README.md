@@ -1,9 +1,10 @@
 # ethereum-react-todo
 
-Simple todo contract and react front-end. Allows the connected address to create todo items and assign them to another address. Assignee is able to complete and get paid for items.
+Simple todo contract and react front-end. Allows the connected address to create and assignee todo items. Assignee is able to complete and then get paid for items.
 
 ## Demo on Ropsten Network
 [https://eth-todo.netlify.app](https://eth-todo.netlify.app)
+
 [Ropsten Faucet](https://faucet.ropsten.be/)
 
 ## Running locally
