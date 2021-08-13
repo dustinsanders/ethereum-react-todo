@@ -1,4 +1,5 @@
-const local = require('./config/local')
+const safeRequire = require('safe-require')
+const local = safeRequire('./config/local')
 const testnet = require('./config/testnet')
 const get = require('lodash/get')
 
