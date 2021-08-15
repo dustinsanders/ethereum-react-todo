@@ -9,13 +9,21 @@ import ItemAction from './ItemAction'
 import ItemStatus from './ItemStatus'
 import statusEnum from '../enums/status'
 
+const SpacedText = ({ left, right }) => (
+  <Pane
+    display="flex"
+    justifyContent="space-between"
+  >
+    <Text>{left}</Text>
+    <Text>{right}</Text>
+  </Pane>
+)
+
 const Item = props => (
   <Card
     elevation={1}
-    width="100%"
-    height={120}
     marginY={8}
-    paddingX={24}
+    padding={24}
     display="flex"
     flexDirection="column"
   >
@@ -41,8 +49,19 @@ const Item = props => (
         </Pane>
         <ItemAction {...props} />
       </Pane>
-      <Text>Assignee: {props.assignee}</Text>
-      <Text>Cost: {props.priceInEth}(ETH)</Text>
+      <br />
+      <SpacedText
+        left="Cost:"
+        right={`${props.priceInEth} (ETH)`}
+      />
+      <SpacedText
+        left="Owner:"
+        right={props.owner}
+      />
+      <SpacedText
+        left="Assignee:"
+        right={props.assignee}
+      />
   </Card>
 )
 
