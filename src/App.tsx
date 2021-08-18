@@ -1,10 +1,13 @@
+import React, { useEffect } from 'react'
 import { Pane } from 'evergreen-ui'
 import Container from '@material-ui/core/Container'
 import Header, { height } from './components/Header'
 import ErrorMessage from './components/ErrorMessage'
 import Items from './components/Items'
 import PageSpinner from './components/PageSpinner'
-import useTodoContract from './hooks/useTodoContract'
+import { StoreProvider } from 'easy-peasy'
+import store from './store'
+import { useStoreState, useStoreActions } from './store/hooks'
 
 const App = () => {
   const {
@@ -12,7 +15,13 @@ const App = () => {
     items,
     loading,
     selectedAddress,
-  } = useTodoContract()
+  } = useStoreState(state => state.todo)
+
+  const actions = useStoreActions(state => state.todo)
+
+  useEffect(() => {
+    actions.initialize()
+  }, [actions])
 
   if (error) {
     return (
@@ -50,11 +59,11 @@ const App = () => {
         marginTop={height + 16}
       >
         <Container maxWidth="sm">
-          <Items items={items} selectedAddress={selectedAddress} />
+          <Items />
         </Container>
       </Pane>
     </>
   )
 }
 
-export default App;
+export default () => <StoreProvider store={store}><App /></StoreProvider>

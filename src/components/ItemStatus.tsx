@@ -2,7 +2,10 @@ import React from 'react';
 import { Badge } from 'evergreen-ui'
 import statusEnum from '../enums/status'
 
-const ItemStatusBadge = ({ status }) => {
+interface ItemStatusBadgeProps {
+  status: number
+}
+const ItemStatusBadge = ({ status }: ItemStatusBadgeProps) => {
   switch (status) {
     case statusEnum.CREATED: {
       return <Badge color="blue">In Progress</Badge>
@@ -22,10 +25,14 @@ const ItemStatusBadge = ({ status }) => {
   }
 }
 
+interface ItemStatusProps {
+  isOwner: boolean
+  status: number
+}
 const ItemStatus = ({
   isOwner,
   status,
-}) => {
+}: ItemStatusProps) => {
 
   return (
     <>

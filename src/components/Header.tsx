@@ -5,12 +5,12 @@ import {
   Text,
 } from 'evergreen-ui'
 import AddItem from './AddItem'
-import useTodoContract from '../hooks/useTodoContract'
+import { useStoreState } from '../store/hooks'
 
-export const height = 115
+export const height = 150
 
 const Header = () => {
-  const { selectedAddress } = useTodoContract()
+  const { selectedAddress } = useStoreState(state => state.todo)
 
   return (
     <Pane

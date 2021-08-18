@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Card,
   Heading,
@@ -8,8 +7,13 @@ import {
 import ItemAction from './ItemAction'
 import ItemStatus from './ItemStatus'
 import statusEnum from '../enums/status'
+import { Item as ItemInterface } from '../store/models/todo'
 
-const SpacedText = ({ left, right }) => (
+interface SpacedTextProps {
+  left: string
+  right: string
+}
+const SpacedText = ({ left, right }: SpacedTextProps) => (
   <Pane
     display="flex"
     justifyContent="space-between"
@@ -19,7 +23,7 @@ const SpacedText = ({ left, right }) => (
   </Pane>
 )
 
-const Item = props => (
+const Item = (props: ItemInterface) => (
   <Card
     elevation={1}
     marginY={8}

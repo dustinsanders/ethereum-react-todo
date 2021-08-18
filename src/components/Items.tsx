@@ -1,10 +1,9 @@
 import { Pane, Text } from 'evergreen-ui'
-import React from 'react'
 import Item from './Item'
-import useTodoContract from '../hooks/useTodoContract'
+import { useStoreState } from '../store/hooks'
 
 const Items = () => {
-  const { items } = useTodoContract()
+  const { items } = useStoreState(state => state.todo)
 
   if (!items.length) {
     return (
@@ -18,9 +17,15 @@ const Items = () => {
     )
   }
 
-  return items.map(item => (
-    <Item key={item.id.toString()} {...item} />
-  ))
+  return (
+    <>
+      {
+        items.map(item => (
+          <Item key={item.id.toString()} {...item} />
+        ))
+      }
+    </>
+  )
 }
 
 export default Items

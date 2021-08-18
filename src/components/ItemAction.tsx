@@ -4,18 +4,22 @@ import {
   SendToIcon,
   TickIcon,
   TrashIcon,
+  ButtonProps,
 } from 'evergreen-ui'
-import useTodoContract from '../hooks/useTodoContract'
 import statusEnum from '../enums/status'
+import { useStoreActions } from '../store/hooks'
+import { Item as ItemInterface } from '../store/models/todo'
 
-const IconButton = ({ icon, ...props }) => (
+interface IconButtonProps extends ButtonProps {
+  icon: JSX.Element,
+}
+const IconButton = ({ icon, ...props }: IconButtonProps) => (
   <Button
     iconBefore={
       <Pane
         display="flex"
         marginRight={-4}
         paddingLeft={4}
-
       >
         {icon}
       </Pane>
@@ -25,19 +29,17 @@ const IconButton = ({ icon, ...props }) => (
 )
 
 const ItemAction = ({
-  assignee,
   id,
-  owner,
   price,
   status,
   isAssignee,
   isOwner,
-}) => {
+}: ItemInterface) => {
   const {
     completeItem,
     confirmItem,
     deleteItem,
-  } = useTodoContract()
+  } = useStoreActions(actions => actions.todo)
 
   switch (status) {
     case statusEnum.CREATED: {
@@ -68,7 +70,7 @@ const ItemAction = ({
           icon={<SendToIcon />}
           children="Confirm & Pay"
           intent="success"
-          onClick={() => confirmItem(id, price)}
+          onClick={() => confirmItem(id)}
         />
       )
     }
