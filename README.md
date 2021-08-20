@@ -34,5 +34,8 @@ Connect MetaMask to localhost network
 * React
 * Hardhat
 * Ethers.js
+* TypeChain
+* TypeScript
+* Easy Peasy
 * Evergreen UI
 * Netlify Functions
