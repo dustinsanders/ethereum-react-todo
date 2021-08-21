@@ -119,7 +119,7 @@ const todoModel: TodoModel = {
     )
   }),
   getItems: thunk(async (actions, _payload, { getState }) => {
-    const todo = await actions.getInstance()
+    const todo = await actions.getInstance(true)
     const { selectedAddress } = getState()
     const items = await todo.getItemsAtAddress(selectedAddress)
 
