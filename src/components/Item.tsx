@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Card,
   Heading,
@@ -8,8 +7,13 @@ import {
 import ItemAction from './ItemAction'
 import ItemStatus from './ItemStatus'
 import statusEnum from '../enums/status'
+import { Item as ItemInterface } from '../store/models/todo'
 
-const SpacedText = ({ left, right }) => (
+interface SpacedTextProps {
+  left: string
+  right: string
+}
+const SpacedText = ({ left, right }: SpacedTextProps) => (
   <Pane
     display="flex"
     justifyContent="space-between"
@@ -19,7 +23,7 @@ const SpacedText = ({ left, right }) => (
   </Pane>
 )
 
-const Item = props => (
+const Item = (props: ItemInterface) => (
   <Card
     elevation={1}
     marginY={8}
@@ -38,16 +42,18 @@ const Item = props => (
           width="100%"
           marginY={8}
         >
-          <Heading
-            textDecoration={props.status === statusEnum.DELETED ? 'line-through' : 'auto'}
-          >
+          <Heading textDecoration={
+            props.status === statusEnum.DELETED ? 'line-through' : 'auto'
+          }>
             {props.title}
           </Heading>
           <div>
             <ItemStatus {...props} />
           </div>
         </Pane>
-        <ItemAction {...props} />
+        <Pane display="flex">
+          <ItemAction {...props} />
+        </Pane>
       </Pane>
       <br />
       <SpacedText

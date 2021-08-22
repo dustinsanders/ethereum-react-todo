@@ -3,7 +3,6 @@ import {
   Link,
   Text,
 } from 'evergreen-ui'
-import React from 'react'
 
 const network = 'Ropsten'
 

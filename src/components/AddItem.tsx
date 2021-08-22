@@ -1,4 +1,8 @@
-import React, { useCallback, useState } from 'react'
+import {
+  ChangeEvent,
+  useCallback,
+  useState,
+} from 'react'
 import {
   Button,
   Dialog,
@@ -7,24 +11,25 @@ import {
   TextInputField,
 } from 'evergreen-ui'
 import { utils } from 'ethers'
-import useTodoContract from '../hooks/useTodoContract'
 import toNumber from 'lodash/toNumber'
+import { useStoreActions, useStoreState } from '../store/hooks'
 
 const minimumPrice = .0001
 
 const AddItem = () => {
-  const { addItem, isSameAddress, selectedAddress } = useTodoContract()
+  const { addItem } = useStoreActions(actions => actions.todo)
+  const { isSameAddress, selectedAddress } = useStoreState(state => state.todo)
 
   const [assignee, setAssignee] = useState('')
   const [title, setTitle] = useState('')
-  const [price, setPrice] = useState(0)
+  const [priceInEth, setPrice] = useState('')
   const [open, setOpen] = useState(false)
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
 
   const titleValid = title.length >= 3
-  const assigneeValid = utils.isAddress(assignee) && !isSameAddress(assignee, selectedAddress)
-  const priceValid = typeof toNumber(price) === 'number'
-    && toNumber(price) >= minimumPrice
+  const assigneeValid = utils.isAddress(assignee)
+    && !isSameAddress(assignee, selectedAddress)
+  const priceValid = toNumber(priceInEth) >= minimumPrice
   const isConfirmDisabled = !(titleValid && assigneeValid && priceValid)
 
   const textInputFieldProps = {
@@ -37,11 +42,11 @@ const AddItem = () => {
   const onConfirm = useCallback(async () => {
     setIsConfirmLoading(true)
 
-    await addItem({ title, assignee, price })
+    await addItem({ title, assignee, priceInEth })
 
     setIsConfirmLoading(false)
     setOpen(false)
-  }, [title, assignee, price, setIsConfirmLoading, setOpen, addItem])
+  }, [title, assignee, priceInEth, setIsConfirmLoading, setOpen, addItem])
 
   return (
     <>
@@ -69,9 +74,10 @@ const AddItem = () => {
           <TextInputField
             {...textInputFieldProps}
             label="Title"
+            placeholder="Title"
             value={title}
             isInvalid={!titleValid}
-            onChange={evt => setTitle(evt.target.value)}
+            onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
           />
           <TextInputField
             {...textInputFieldProps}
@@ -79,15 +85,20 @@ const AddItem = () => {
             placeholder="0x..."
             value={assignee}
             isInvalid={!assigneeValid}
-            onChange={evt => setAssignee(evt.target.value)}
+            onChange={(evt: ChangeEvent<HTMLInputElement>) => setAssignee(evt.target.value)}
           />
           <TextInputField
             {...textInputFieldProps}
             label="Price(ETH)"
-            value={price}
+            type="number"
+            placeholder="0.0"
+            value={priceInEth}
             isInvalid={!priceValid}
             description={`minimum of ${minimumPrice}(ETH)`}
-            onChange={evt => setPrice(evt.target.value)}
+            onChange={(evt: ChangeEvent<HTMLInputElement>) =>
+
+              setPrice(evt.target.value)
+            }
           />
         </Pane>
       </Dialog>

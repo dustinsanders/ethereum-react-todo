@@ -1,3 +1,5 @@
+require('@typechain/hardhat')
+require('@nomiclabs/hardhat-ethers')
 require('@nomiclabs/hardhat-waffle')
 require('dotenv').config()
 
@@ -18,4 +20,7 @@ module.exports = {
       chainId: 1337,
     }
   },
+  typechain: {
+    outDir: 'src/artifacts/typechain',
+  }
 }
