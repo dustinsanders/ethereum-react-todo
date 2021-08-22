@@ -7410,7 +7410,7 @@ eventsource@^1.0.7:
   dependencies:
     original "^1.0.0"
 
-evergreen-ui@^6.3.0:
+evergreen-ui@^6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/evergreen-ui/-/evergreen-ui-6.4.0.tgz#5a0a88af3ca6ecce235d48edbf855f2ccfa07582"
   integrity sha512-dRNCx2Of2Sex30FcBzmOJA+egBLINWPIu2hm2KI5F3bpLsswvLfi3tIfNXN5RWxEK94RUguPgFLUlFcP5ExYSQ==

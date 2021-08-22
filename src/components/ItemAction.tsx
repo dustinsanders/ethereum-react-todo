@@ -1,76 +1,77 @@
+import { useCallback, useState } from 'react'
 import {
   Button,
   Pane,
   SendToIcon,
   TickIcon,
   TrashIcon,
-  ButtonProps,
 } from 'evergreen-ui'
 import statusEnum from '../enums/status'
 import { useStoreActions } from '../store/hooks'
 import { Item as ItemInterface } from '../store/models/todo'
-
-interface IconButtonProps extends ButtonProps {
-  icon: JSX.Element,
-}
-const IconButton = ({ icon, ...props }: IconButtonProps) => (
-  <Button
-    iconBefore={
-      <Pane
-        display="flex"
-        marginRight={-4}
-        paddingLeft={4}
-      >
-        {icon}
-      </Pane>
-    }
-    {...props}
-  />
-)
+import ethers from 'ethers'
 
 const ItemAction = ({
   id,
-  price,
   status,
   isAssignee,
   isOwner,
 }: ItemInterface) => {
+  const [loading, setLoading] = useState(false)
   const {
     completeItem,
     confirmItem,
     deleteItem,
   } = useStoreActions(actions => actions.todo)
 
+  const wrapLoader = useCallback(
+    (action: (id: ethers.BigNumber) => Promise<void>) =>
+      async () => {
+        try {
+          setLoading(true)
+          await action(id)
+          setLoading(false)
+        } catch (e) {
+          console.error(e)
+          setLoading(false)
+        }
+      },
+    [id],
+  )
+
   switch (status) {
     case statusEnum.CREATED: {
       return (
         <>
-          <IconButton
+          <Button
             disabled={!isOwner}
-            icon={<TrashIcon />}
+            iconBefore={<TrashIcon />}
             marginRight={8}
             intent="danger"
-            onClick={() => deleteItem(id)}
+            onClick={wrapLoader(deleteItem)}
             children="Delete"
+            isLoading={loading && isOwner}
           />
-          <IconButton
+          <Button
             disabled={!isAssignee}
-            icon={<TickIcon />}
-            onClick={() => completeItem(id)}
+            iconBefore={<TickIcon />}
+            onClick={wrapLoader(completeItem)}
             intent="success"
             children="Complete"
+            isLoading={loading && isAssignee}
           />
         </>
       )
     }
     case statusEnum.COMPLETED: {
       return (
-        <IconButton
+        <Button
           disabled={!isOwner}
-          icon={<SendToIcon />}
+          iconBefore={<SendToIcon />}
           children="Confirm & Pay"
           intent="success"
-          onClick={() => confirmItem(id)}
+          onClick={wrapLoader(confirmItem)}
+          isLoading={loading}
         />
       )
     }

@@ -42,16 +42,18 @@ const Item = (props: ItemInterface) => (
           width="100%"
           marginY={8}
         >
-          <Heading
-            textDecoration={props.status === statusEnum.DELETED ? 'line-through' : 'auto'}
-          >
+          <Heading textDecoration={
+            props.status === statusEnum.DELETED ? 'line-through' : 'auto'
+          }>
             {props.title}
           </Heading>
           <div>
             <ItemStatus {...props} />
           </div>
         </Pane>
-        <ItemAction {...props} />
+        <Pane display="flex">
+          <ItemAction {...props} />
+        </Pane>
       </Pane>
       <br />
       <SpacedText
