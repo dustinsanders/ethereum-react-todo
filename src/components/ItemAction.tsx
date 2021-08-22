@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import {
   Button,
-  Pane,
   SendToIcon,
   TickIcon,
   TrashIcon,
