@@ -4,7 +4,7 @@ import {
   Text,
 } from 'evergreen-ui'
 
-const network = 'Ropsten'
+const network = 'Sepolia'
 
 const ErrorMessage = () => (
   <Alert

@@ -3,7 +3,7 @@
 Simple todo contract and react front-end. Allows the connected address to create and assign todo items. Assignee is able to complete and then get paid for items.
 
 ## Demo
-Ropsten: [https://eth-todo.netlify.app](https://eth-todo.netlify.app)
+Sepolia: [https://eth-todo.netlify.app](https://eth-todo.netlify.app)
 
 Click [here](https://app.mycrypto.com/faucet) for testnet Ether
 
